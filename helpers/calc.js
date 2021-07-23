@@ -1,7 +1,10 @@
-const calcDiff = (initial, newVal) => {
-    return -100 * ((newVal - initial) / initial)
+const calcPercDiff = (initial, newVal) => {
+    return {
+        diffPerc: -100 * ((newVal - initial) / initial),
+        rawDiff: newVal - initial
+    }
 }
 
 module.exports = {
-    calcDiff: calcDiff
+    calcPercDiff: calcPercDiff
 }

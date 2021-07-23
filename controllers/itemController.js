@@ -1,7 +1,6 @@
 'use strict';
 
 const firebase = require('../db');
-const Item = require('../models/Item');
 const firestore = firebase.firestore();
 
 
@@ -9,12 +8,10 @@ const addItem = async (data) => {
     try {
         await firestore.collection('items').doc().set(data);
         // res.send('Record saved successfuly');
-        // return 'Item started to get tracked successfuly!';
         return true;
     } catch (error) {
         // res.status(400).send(error.message);
         return false;
-        // return 'There was a problem adding your Item!';
     }
 }
 
