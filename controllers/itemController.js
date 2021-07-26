@@ -15,6 +15,28 @@ const addItem = async (data) => {
     }
 }
 
+const doesItemExist = async (name) => {
+    try{
+        const itemsRef = await firestore.collection('items');
+        const foundItem = await itemsRef.where('name', '==', name).get();
+
+        return foundItem;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
+const getAllItems = async () => {
+    try{
+        const items = await firestore.collection('items');
+        const data = await items.get();
+        return data;
+    } catch (error) {
+        return false;
+    }
+}
+
 // const getAllItems = async (req, res, next) => {
 //     try {
 //         const items = await firestore.collection('items');
@@ -85,7 +107,8 @@ const addItem = async (data) => {
 
 module.exports = {
     addItem,
-    // getAllItems,
+    doesItemExist,
+    getAllItems
     // getItem,
     // updateItem,
     // deleteItem

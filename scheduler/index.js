@@ -5,6 +5,8 @@ const firestore = firebase.firestore();
 
 // Every day at 00:00
 // 0 0 * * *
+// Every min.
+// * * * * *
 const job = schedule.scheduleJob('* * * * *', async function(){
     console.log('Updating items...');
     const items = await firestore.collection('items');

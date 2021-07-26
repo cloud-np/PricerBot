@@ -31,7 +31,19 @@ const sendTrackCmdErrorEm = (message) => {
     message.channel.send(em);
 }
 
-const sendAddingItemSucsEm = (message) => {
+const sendItemExistAlreadyEm = (message) => {
+    const em = new Discord.MessageEmbed()
+        .setColor('#00d31c')
+        .setAuthor('✨ Item exists already!')
+        .addFields(
+            { name: 'Item is already being tracked!', value: 'The item you try to add has already been added in the database.' },
+            // { name: 'Feel free to check the price yourself.', value: 'With **\\check [url]** command you can check and also update the price yourself.' },
+        )
+        .setTimestamp();
+    message.channel.send(em);
+}
+
+const sendAddedItemSucsEm = (message) => {
     const em = new Discord.MessageEmbed()
         .setColor('#00d31c')
         .setAuthor('👌 Your item was added!')
@@ -43,23 +55,39 @@ const sendAddingItemSucsEm = (message) => {
     message.channel.send(em);
 }
 
-const sendBetterItemPriceEm = (message, item, { newPrice, diffPerc, rawDiff }) => {
+const test = (message) => {
+    const partyblob = '<a:partyblob:866343043442671647>'
     const em = new Discord.MessageEmbed()
         .setColor('#00d31c')
-        .setAuthor('<a:partyblob:866343043442671647> There is a new lower price!')
-        .setURL(item.url)
-        .setImage(item.imgUrl)
+        .setAuthor(partyblob + ' There is a new lower price!')
         .addFields(
-            { name: 'Your tracked item: ' + item.name + ' has dropped in price today!', value: '.' },
-            // { name: 'Feel free to check the price yourself.', value: 'With **\\check [url]** command you can check and also update the price yourself.' },
+            { name: partyblob, value: partyblob},
         )
         .setTimestamp();
     message.channel.send(em);
 }
 
+const sendBetterItemPriceEm = (channel, item, { newPrice, diffPerc, rawDiff }) => {
+    const partyblob = '<a:partyblob:866343043442671647>'
+    const em = new Discord.MessageEmbed()
+        .setColor('#2dfcf2')
+        .setAuthor('🎉 There is a new lower price!')
+        .setURL(item.url)
+        .setImage(item.imgUrl)
+        .addFields(
+            { name: item.name, value: 'Has dropped in price today from **'+ item.price +'** to **'+ newPrice +'**' },
+            { name: 'Raw Price Differecne', value: rawDiff , inline: true },
+            { name: 'Percentage Difference', value: diffPerc + '%' , inline: true },
+        )
+        .setTimestamp();
+    channel.send(em);
+}
+
 module.exports = {
     sendTrackCmdErrorEm: sendTrackCmdErrorEm,
     sendAddingItemErrorEm: sendAddingItemErrorEm,
-    sendAddingItemSucsEm: sendAddingItemSucsEm,
-    // sendBetterItemPriceEm: 
+    sendAddedItemSucsEm: sendAddedItemSucsEm,
+    sendItemExistAlreadyEm: sendItemExistAlreadyEm,
+    sendBetterItemPriceEm: sendBetterItemPriceEm,
+    test: test
 }
