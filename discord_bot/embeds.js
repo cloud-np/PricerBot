@@ -68,7 +68,7 @@ const test = (message) => {
 }
 
 const sendBetterItemPriceEm = (channel, item, { newPrice, diffPerc, rawDiff }) => {
-    const partyblob = '<a:partyblob:866343043442671647>'
+    // const partyblob = '<a:partyblob:866343043442671647>'
     const em = new Discord.MessageEmbed()
         .setColor('#2dfcf2')
         .setAuthor('🎉 There is a new lower price!')

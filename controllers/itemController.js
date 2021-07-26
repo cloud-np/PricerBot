@@ -20,6 +20,8 @@ const doesItemExist = async (name) => {
         const itemsRef = await firestore.collection('items');
         const foundItem = await itemsRef.where('name', '==', name).get();
 
+        if (foundItem.empty)
+            return false;
         return foundItem;
     } catch (error) {
         console.log(error);

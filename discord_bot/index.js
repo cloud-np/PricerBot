@@ -1,8 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-// const config = require('../config');
-const botConfig = require('./bot_config.json');
+const config = require('../config');
 
 const command = require('./commands');
 const itemController = require('../controllers/itemController');
@@ -40,7 +39,11 @@ client.on('ready', () => {
         embeds.test(message);
     });
 
-    const job = schedule.scheduleJob('* * * * *', async function(){
+    command(client, 'show-tracked', message => {
+
+    });
+
+    const job = schedule.scheduleJob('0 0 * * *', async function(){
         console.log('Updating items...');
         const items = await firestore.collection('items');
         const itemsData = await items.get();
@@ -48,7 +51,7 @@ client.on('ready', () => {
         if (itemsData.empty)
             return;
 
-        const guild_id = botConfig.testServer;
+        const guild_id = config.testServerID;
         const guild = client.guilds.cache.find(guild => guild.id === guild_id);
         let channel;
         if(guild)
@@ -96,4 +99,4 @@ client.on('ready', () => {
 })
 
 // Login the Bot
-client.login(botConfig.token);
+client.login(config.botToken);

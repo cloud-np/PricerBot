@@ -10,7 +10,11 @@ const {
     PROJECT_ID,
     STORAGE_BUCKET,
     MESSAGING_SENDER_ID,
-    APP_ID
+    APP_ID,
+    BOT_TOKEN,
+    PREFIX,
+    MAIN_SERVER_ID,
+    TEST_SERVER_ID
 } = process.env;
 
 
@@ -24,5 +28,9 @@ module.exports = {
         storageBucket: STORAGE_BUCKET,
         messagingSenderId: MESSAGING_SENDER_ID,
         appId: APP_ID
-    }
+    },
+    botToken: BOT_TOKEN,
+    prefix: PREFIX,
+    mainServerID: MAIN_SERVER_ID,
+    testServerID: TEST_SERVER_ID
 }
