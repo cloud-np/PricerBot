@@ -8,5 +8,8 @@
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0"
+  },
+  "scripts": {
+    "start": "node discord_bot/index.js"
   }
 }
