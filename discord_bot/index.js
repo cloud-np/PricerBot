@@ -73,7 +73,7 @@ client.on('ready', () => {
     
     command(client, 'track', async message => {
         // Remove spaces and keep the message from the user.
-        const url = message.content.split(' ').join('').split('\\track')[1];
+        const url = message.content.split(' ').join('').split(config.prefix + 'track')[1];
 
         if (url.startsWith('https://www.skroutz.gr/')){
 
