@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const config = require('../config');
 
 const sendAddingItemErrorEm = (message) => {
     const em = new Discord.MessageEmbed()
@@ -15,7 +16,7 @@ const sendAddingItemErrorEm = (message) => {
 const sendTrackCmdErrorEm = (message) => {
     const em = new Discord.MessageEmbed()
         .setColor('#ed3434')
-        .setAuthor('❌ Wrong use of \\track command!')
+        .setAuthor('❌ Wrong use of ' + config.prefix + 'track command!')
         // .setTitle('Tried to use \\track command.')
         // .setURL('https://discord.js.org/')
         // .setAuthor('Some name', 'https://i.imgur.com/wSTFkRM.png', 'https://discord.js.org')
@@ -23,7 +24,7 @@ const sendTrackCmdErrorEm = (message) => {
         // .setThumbnail('https://i.imgur.com/wSTFkRM.png')
         .addFields(
             { name: 'Links ONLY from skroutz.gr', value: 'We only accept links from skroutz.gr at the momment!' },
-            { name: 'Example of a working command', value: '\\track https://www.skroutz.gr/s/17718106/AOC-CQ32G1-Curved-Gaming-Monitor-31-5-QHD-144Hz.html' },
+            { name: 'Example of a working command', value: config.prefix + 'track https://www.skroutz.gr/s/17718106/AOC-CQ32G1-Curved-Gaming-Monitor-31-5-QHD-144Hz.html' },
         )
         // .setImage('https://i.imgur.com/wSTFkRM.png')
         .setTimestamp()
@@ -49,7 +50,7 @@ const sendAddedItemSucsEm = (message) => {
         .setAuthor('👌 Your item was added!')
         .addFields(
             { name: 'Your item is now being tracked!', value: 'Once a day we gonna keep checking the prices and notify you for any great deals.' },
-            { name: 'Feel free to check the price yourself.', value: 'With **\\check [url]** command you can check and also update the price yourself.' },
+            { name: 'Feel free to check the price yourself.', value: 'With **'+ config.prefix +'check [url]** command you can check and also update the price yourself.' },
         )
         .setTimestamp();
     message.channel.send(em);
