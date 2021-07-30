@@ -32,6 +32,18 @@ const sendTrackCmdErrorEm = (message) => {
     message.channel.send(em);
 }
 
+const sendHelpEm = (message) => {
+    const em = new Discord.MessageEmbed()
+        .setColor('#00d31c')
+        .setAuthor('❔ Bot usage.')
+        .addFields(
+            { name: config.prefix + ' track [url]', value: 'This command will try adding to a database the item you specified and keep checking its price reguraly.' },
+            // { name: 'Feel free to check the price yourself.', value: 'With **\\check [url]** command you can check and also update the price yourself.' },
+        )
+        .setTimestamp();
+    message.channel.send(em);
+}
+
 const sendItemExistAlreadyEm = (message) => {
     const em = new Discord.MessageEmbed()
         .setColor('#00d31c')
@@ -90,5 +102,6 @@ module.exports = {
     sendAddedItemSucsEm: sendAddedItemSucsEm,
     sendItemExistAlreadyEm: sendItemExistAlreadyEm,
     sendBetterItemPriceEm: sendBetterItemPriceEm,
+    sendHelpEm: sendHelpEm,
     test: test
 }
