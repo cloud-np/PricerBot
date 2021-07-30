@@ -68,7 +68,7 @@ client.on('ready', () => {
             const itemData = doc.data();
             const updatedItem = await crawler.parseItem(itemData.url);
             const oldPrice = itemData.price;
-            if (oldPrice === updatedItem.price){
+            if (oldPrice > updatedItem.price){
                 const prices = helpers.calcPercDiff(oldPrice, updatedItem.price);
                 embeds.sendBetterItemPriceEm(channel, itemData, prices);
             }
