@@ -11,6 +11,7 @@ const schedule = require('node-schedule');
 const firebase = require('../db');
 const firestore = firebase.firestore();
 const crawler = require('../crawler');
+const userController = require('../controllers/userController');
 
 const getDefaultChannel = (guild) => {
     // get "original" default channel
@@ -36,7 +37,13 @@ client.on('ready', () => {
 
     command(client, 'ping', message => {
         message.channel.send("Pong!");
-        embeds.test(message);
+        const userID = message.author.id;
+        const user = client.users.cache.get(userID);
+        user.send(userID);
+    });
+
+    command(client, 'help', message => {
+        embeds.sendHelpEm(message);
     });
 
     command(client, 'show-tracked', message => {
@@ -93,6 +100,21 @@ client.on('ready', () => {
 
             if(wasItemAdded === true) embeds.sendAddedItemSucsEm(message);
             else embeds.sendAddingItemErrorEm(message);
+
+            // Get user that send the cmd.
+            const user = client.users.cache.get(message.author.id);
+            const wasUserAdded = await userController.addUser(user);
+            // embeds.send
+
+
+            // Check if the item exists on the db.
+            const userExistAlready = await userController.doesUserExist(user.id);
+
+            if (userExistAlready){
+                embeds.sendItemExistAlreadyEm(message);
+                return;
+            }
+
 
         }else embeds.sendTrackCmdErrorEm(message);
     });

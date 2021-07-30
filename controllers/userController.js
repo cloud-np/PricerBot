@@ -4,9 +4,14 @@ const firebase = require('../db');
 const firestore = firebase.firestore();
 
 
-const addItem = async (data) => {
+const addUser = async (user, itemRef) => {
     try {
-        await firestore.collection('items').doc().set(data);
+        await firestore.collection('users').doc().set({ 
+            discordID: user.id, 
+            descriminator: user.descriminator, 
+            username: user.username, 
+            itemRef: itemRef 
+        });
         // res.send('Record saved successfuly');
         return true;
     } catch (error) {
@@ -15,37 +20,26 @@ const addItem = async (data) => {
     }
 }
 
-const doesItemExist = async (name) => {
+const doesUserExist = async (discordID) => {
     try{
-        const itemsRef = await firestore.collection('items');
-        const foundItem = await itemsRef.where('name', '==', name).get();
+        const usersRef = await firestore.collection('users');
+        const foundUser = await usersRef.where('discordID', '==', discordID).get();
 
-        if (foundItem.empty)
+        if (foundUser.empty)
             return false;
-        return foundItem;
+        return foundUser;
     } catch (error) {
         console.log(error);
         return false;
     }
 }
 
-const getAllItems = async () => {
+const getAllUsers = async () => {
     try{
-        const items = await firestore.collection('items');
+        const items = await firestore.collection('users');
         const data = await items.get();
         return data;
     } catch (error) {
-        console.log(error);
-        return false;
-    }
-}
-
-const getItem = async (name) => {
-    try {
-        const itemsRef = await firestore.collection('items');
-        return await itemsRef.where('name', '==', name).get();
-    } catch (error) {
-        console.log(error);
         return false;
     }
 }
@@ -119,9 +113,9 @@ const getItem = async (name) => {
 // }
 
 module.exports = {
-    addItem,
-    doesItemExist,
-    getAllItems
+    addUser: addUser,
+    doesUserExist: doesUserExist,
+    getAllUsers: getAllUsers
     // getItem,
     // updateItem,
     // deleteItem
