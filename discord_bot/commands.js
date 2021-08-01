@@ -12,7 +12,7 @@ module.exports = (client, aliases, callback) => {
             const command = `${config.prefix}${alias}`
             
             if(content.startsWith(`${command}`) || content === command){
-                console.log('Running the command ' + command)
+                console.log('Running cmd: ' + command)
                 callback(message)
             }
         })

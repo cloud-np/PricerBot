@@ -4,30 +4,36 @@ const firebase = require('../db');
 const firestore = firebase.firestore();
 
 
-const addUser = async (user, itemRef) => {
+const tryAddingUser = async (user, itemRef) => {
     try {
-        await firestore.collection('users').doc().set({ 
-            discordID: user.id, 
-            descriminator: user.descriminator, 
-            username: user.username, 
-            itemRef: itemRef 
-        });
-        // res.send('Record saved successfuly');
-        return true;
+        const userExistAlready = await doesUserExist(user.id, itemRef);
+
+        if (userExistAlready.isUserFound){
+            return { user: userExistAlready.user, isTracked: userExistAlready.isUserFound }
+        }else{
+            const addedUser = await firestore.collection('users').add({ 
+                discordID: user.id, 
+                discriminator: user.discriminator, 
+                username: user.username, 
+                items: [itemRef]
+            });
+            return { user: addedUser, isTracked: false }
+        }
     } catch (error) {
-        // res.status(400).send(error.message);
+        console.log(error);
         return false;
     }
 }
 
-const doesUserExist = async (discordID) => {
+const doesUserExist = async (discordID, itemRef) => {
     try{
         const usersRef = await firestore.collection('users');
         const foundUser = await usersRef.where('discordID', '==', discordID).get();
 
         if (foundUser.empty)
             return false;
-        return foundUser;
+        // Check if the item is being tracked by the user.
+        return await foundUser.docs[0].data().items.includes(itemRef);
     } catch (error) {
         console.log(error);
         return false;
@@ -113,9 +119,9 @@ const getAllUsers = async () => {
 // }
 
 module.exports = {
-    addUser: addUser,
-    doesUserExist: doesUserExist,
-    getAllUsers: getAllUsers
+    tryAddingUser,
+    doesUserExist,
+    getAllUsers,
     // getItem,
     // updateItem,
     // deleteItem

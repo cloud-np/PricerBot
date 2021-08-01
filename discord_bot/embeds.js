@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const config = require('../config');
+const { roundTo } = require('../helpers/calc');
 
 const sendAddingItemErrorEm = (message) => {
     const em = new Discord.MessageEmbed()
@@ -47,9 +48,9 @@ const sendHelpEm = (message) => {
 const sendItemExistAlreadyEm = (message) => {
     const em = new Discord.MessageEmbed()
         .setColor('#00d31c')
-        .setAuthor('✨ Item exists already!')
+        .setAuthor('✨ You already are tracking this item!')
         .addFields(
-            { name: 'Item is already being tracked!', value: 'The item you try to add has already been added in the database.' },
+            { name: 'Item is already being tracked by you!', value: 'The item you try to add has already been added in the database.' },
             // { name: 'Feel free to check the price yourself.', value: 'With **\\check [url]** command you can check and also update the price yourself.' },
         )
         .setTimestamp();
@@ -59,10 +60,10 @@ const sendItemExistAlreadyEm = (message) => {
 const sendAddedItemSucsEm = (message) => {
     const em = new Discord.MessageEmbed()
         .setColor('#00d31c')
-        .setAuthor('👌 Your item was added!')
+        .setAuthor('👌 Item was added to your list!')
         .addFields(
-            { name: 'Your item is now being tracked!', value: 'Once a day we gonna keep checking the prices and notify you for any great deals.' },
-            { name: 'Feel free to check the price yourself.', value: 'With **'+ config.prefix +'check [url]** command you can check and also update the price yourself.' },
+            { name: 'The item is now being tracked for you!', value: 'Once a day we gonna keep checking the prices and notify you for any great deals.' },
+            // { name: 'Feel free to check the price yourself.', value: 'With **'+ config.prefix +'check [url]** command you can check and also update the price yourself.' },
         )
         .setTimestamp();
     message.channel.send(em);
@@ -72,9 +73,9 @@ const test = (message) => {
     const partyblob = '<a:partyblob:866343043442671647>'
     const em = new Discord.MessageEmbed()
         .setColor('#00d31c')
-        .setAuthor(partyblob + ' There is a new lower price!')
+        .setAuthor(' Test!')
         .addFields(
-            { name: partyblob, value: partyblob},
+            { name: partyblob, value: ''},
         )
         .setTimestamp();
     message.channel.send(em);
@@ -86,22 +87,23 @@ const sendBetterItemPriceEm = (channel, item, { newPrice, diffPerc, rawDiff }) =
         .setColor('#2dfcf2')
         .setAuthor('🎉 There is a new lower price!')
         .setURL(item.url)
+        .setTitle(item.name)
         .setImage(item.imgUrl)
         .addFields(
-            { name: item.name, value: 'Has dropped in price today from **'+ item.price +'** to **'+ newPrice +'**' },
-            { name: 'Raw Price Differecne', value: rawDiff , inline: true },
-            { name: 'Percentage Difference', value: diffPerc + '%' , inline: true },
+            { name: 'Dropped in price', value: 'This item has dropped in price today from **'+ item.price +'** to **'+ newPrice +'**' },
+            { name: 'Raw Price Differecne', value: roundTo(rawDiff, 2) , inline: true },
+            { name: 'Percentage Difference', value: roundTo(diffPerc, 1) + '%' , inline: true },
         )
         .setTimestamp();
     channel.send(em);
 }
 
 module.exports = {
-    sendTrackCmdErrorEm: sendTrackCmdErrorEm,
-    sendAddingItemErrorEm: sendAddingItemErrorEm,
-    sendAddedItemSucsEm: sendAddedItemSucsEm,
-    sendItemExistAlreadyEm: sendItemExistAlreadyEm,
-    sendBetterItemPriceEm: sendBetterItemPriceEm,
-    sendHelpEm: sendHelpEm,
-    test: test
+    sendTrackCmdErrorEm,
+    sendAddingItemErrorEm,
+    sendAddedItemSucsEm,
+    sendItemExistAlreadyEm,
+    sendBetterItemPriceEm,
+    sendHelpEm,
+    test
 }

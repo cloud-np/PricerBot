@@ -37,9 +37,6 @@ client.on('ready', () => {
 
     command(client, 'ping', message => {
         message.channel.send("Pong!");
-        const userID = message.author.id;
-        const user = client.users.cache.get(userID);
-        user.send(userID);
     });
 
     command(client, 'help', message => {
@@ -77,6 +74,43 @@ client.on('ready', () => {
         });
         console.log('Updated all successfully items!!');
     });
+
+    command(client, 'tt', async message => {
+        // console.log(user);
+    })
+
+    command(client, 'test-job', async message => {
+        console.log('Updating items...');
+        const items = await firestore.collection('items').get();
+
+        if (items.empty)
+            return;
+
+        const guild_id = config.testServerID;
+        const guild = client.guilds.cache.find(guild => guild.id === guild_id);
+        let channel;
+        if(guild)
+            channel = getDefaultChannel(guild);
+
+        items.forEach(async doc => {
+            const itemData = doc.data();
+            const updatedItem = await crawler.parseItem(itemData.url);
+            const oldPrice = itemData.price;
+            if (oldPrice === updatedItem.price){
+                const prices = helpers.calcPercDiff(oldPrice, updatedItem.price);
+                // Update every subscribed user.
+                const users = await firestore.collection('items').doc(doc.id).collection('users').get();
+                users.forEach(async doc => {
+                    // console.log(doc.data());
+                    const channel = client.users.cache.get(doc.data().discordID);
+                    embeds.sendBetterItemPriceEm(channel, itemData, prices);
+                });
+            }
+            
+            await doc.ref.update(updatedItem);
+        });
+        console.log('Updated all successfully items!!');
+    })
     
     command(client, 'track', async message => {
         // Remove spaces and keep the message from the user.
@@ -84,37 +118,30 @@ client.on('ready', () => {
 
         if (url.startsWith('https://www.skroutz.gr/')){
 
+            ////////////////////////////////////
+            // CHECK ITEM
             // Scrape the item from online.
             const item = await crawler.parseItem(url, true);
-
             // Check if the item exists on the db.
-            const itemExistAlready = await itemController.doesItemExist(item.name);
 
-            if (itemExistAlready){
-                embeds.sendItemExistAlreadyEm(message);
-                return;
-            }
+            const itemAddedInfo = await itemController.tryAddingItem(item);
+            ////////////////////////////////////
 
-            // Try adding Item to DB.
-            const wasItemAdded = await itemController.addItem(item);
-
-            if(wasItemAdded === true) embeds.sendAddedItemSucsEm(message);
-            else embeds.sendAddingItemErrorEm(message);
-
+            ////////////////////////////////////
+            // CHECK USER
             // Get user that send the cmd.
             const user = client.users.cache.get(message.author.id);
-            const wasUserAdded = await userController.addUser(user);
-            // embeds.send
-
 
             // Check if the item exists on the db.
-            const userExistAlready = await userController.doesUserExist(user.id);
+            const userAdded = await itemController.tryAddingUser(user, itemAddedInfo.item.id);
+            ////////////////////////////////////
 
-            if (userExistAlready){
+            if (userAdded.isTracked === false || itemAddedInfo.isTracked === false){
+                embeds.sendAddedItemSucsEm(message);
+            }else if (itemAddedInfo.isTracked && userAdded.isTracked){
                 embeds.sendItemExistAlreadyEm(message);
                 return;
-            }
-
+            } else embeds.sendAddingItemErrorEm(message);
 
         }else embeds.sendTrackCmdErrorEm(message);
     });

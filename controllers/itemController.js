@@ -3,24 +3,61 @@
 const firebase = require('../db');
 const firestore = firebase.firestore();
 
-
-const addItem = async (data) => {
+const doesUserExist = async (discordID, itemID) => {
     try {
-        await firestore.collection('items').doc().set(data);
-        // res.send('Record saved successfuly');
-        return true;
+        const foundUser = await firestore.collection('items').doc(itemID).collection('users').where('discordID', '==', discordID).get();
+
+        if (foundUser.empty)
+            return false;
+        // Check if the item is being tracked by the user.
+        return await foundUser.docs[0].data();
     } catch (error) {
-        // res.status(400).send(error.message);
+        console.log(error);
+        return false;
+    }
+}
+
+const tryAddingUser = async (user, itemID) => {
+    try {
+        const foundUser = await doesUserExist(user.id, itemID);
+
+        if (foundUser) {
+            return { user: foundUser, isTracked: true }
+        } else {
+            const addedUser = await firestore.collection('items').doc(itemID).collection('users').add({
+                discordID: user.id,
+                discriminator: user.discriminator,
+                username: user.username
+            });
+            return { user: addedUser, isTracked: false }
+        }
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
+const tryAddingItem = async (item) => {
+    try {
+        const itemExistAlready = await doesItemExist(item.name);
+        if (itemExistAlready) {
+            return { item: itemExistAlready, isTracked: true }
+        } else {
+            const addedItem = await firestore.collection('items').add(item);
+            return { item: addedItem.id, isTracked: false }
+        }
+    } catch (error) {
         return false;
     }
 }
 
 const doesItemExist = async (name) => {
-    try{
+    try {
         const itemsRef = await firestore.collection('items');
-        const foundItem = await itemsRef.where('name', '==', name).get();
+        const snapshot = await itemsRef.where('name', '==', name).get();
+        const foundItem = await snapshot.docs[0];
 
-        if (foundItem.empty)
+        if (!foundItem.exists)
             return false;
         return foundItem;
     } catch (error) {
@@ -30,7 +67,7 @@ const doesItemExist = async (name) => {
 }
 
 const getAllItems = async () => {
-    try{
+    try {
         const items = await firestore.collection('items');
         const data = await items.get();
         return data;
@@ -40,89 +77,23 @@ const getAllItems = async () => {
     }
 }
 
-const getItem = async (name) => {
-    try {
-        const itemsRef = await firestore.collection('items');
-        return await itemsRef.where('name', '==', name).get();
-    } catch (error) {
-        console.log(error);
-        return false;
-    }
-}
-
-// const getAllItems = async (req, res, next) => {
+// const getItem = async (name) => {
 //     try {
-//         const items = await firestore.collection('items');
-//         const data = await items.get();
-//         const itemsArray = [];
-//         if(data.empty) {
-//             res.status(404).send('No Item record found');
-//         }else {
-//             data.forEach(doc => {
-//                 const item = new Item(
-//                     doc.id,
-//                     doc.data().firstName,
-//                     doc.data().lastName,
-//                     doc.data().fatherName,
-//                     doc.data().class,
-//                     doc.data().age,
-//                     doc.data().phoneNumber,
-//                     doc.data().subject,
-//                     doc.data().year,
-//                     doc.data().semester,
-//                     doc.data().status
-//                 );
-//                 itemsArray.push(item);
-//             });
-//             res.send(itemsArray);
-//         }
+//         const itemsRef = await firestore.collection('items');
+//         return await itemsRef.where('name', '==', name).get();
 //     } catch (error) {
-//         res.status(400).send(error.message);
-//     }
-// }
-
-// const getItem = async (req, res, next) => {
-//     try {
-//         const id = req.params.id;
-//         const item = await firestore.collection('items').doc(id);
-//         const data = await item.get();
-//         if(!data.exists) {
-//             res.status(404).send('Item with the given ID not found');
-//         }else {
-//             res.send(data.data());
-//         }
-//     } catch (error) {
-//         res.status(400).send(error.message);
-//     }
-// }
-
-// const updateItem = async (req, res, next) => {
-//     try {
-//         const id = req.params.id;
-//         const data = req.body;
-//         const item =  await firestore.collection('items').doc(id);
-//         await item.update(data);
-//         res.send('Item record updated successfuly');        
-//     } catch (error) {
-//         res.status(400).send(error.message);
-//     }
-// }
-
-// const deleteItem = async (req, res, next) => {
-//     try {
-//         const id = req.params.id;
-//         await firestore.collection('Items').doc(id).delete();
-//         res.send('Record deleted successfuly');
-//     } catch (error) {
-//         res.status(400).send(error.message);
+//         console.log(error);
+//         return false;
 //     }
 // }
 
 module.exports = {
-    addItem,
+    tryAddingItem,
     doesItemExist,
-    getAllItems
+    getAllItems,
     // getItem,
+    tryAddingUser,
+    doesUserExist,
     // updateItem,
     // deleteItem
 }
