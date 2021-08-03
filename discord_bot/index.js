@@ -40,7 +40,7 @@ client.on('ready', () => {
     });
 
     command(client, 'help', message => {
-        embeds.sendHelpEm(message);
+        embeds.sendHelp(message);
     });
 
     command(client, 'show-tracked', message => {
@@ -48,38 +48,6 @@ client.on('ready', () => {
     });
 
     const job = schedule.scheduleJob('0 0 * * *', async function(){
-        console.log('Updating items...');
-        const items = await firestore.collection('items');
-        const itemsData = await items.get();
-
-        if (itemsData.empty)
-            return;
-
-        const guild_id = config.testServerID;
-        const guild = client.guilds.cache.find(guild => guild.id === guild_id);
-        let channel;
-        if(guild)
-            channel = getDefaultChannel(guild);
-
-        itemsData.forEach(async doc => {
-            const itemData = doc.data();
-            const updatedItem = await crawler.parseItem(itemData.url);
-            const oldPrice = itemData.price;
-            if (oldPrice > updatedItem.price){
-                const prices = helpers.calcPercDiff(oldPrice, updatedItem.price);
-                embeds.sendBetterItemPriceEm(channel, itemData, prices);
-            }
-            
-            await doc.ref.update(updatedItem);
-        });
-        console.log('Updated all successfully items!!');
-    });
-
-    command(client, 'tt', async message => {
-        // console.log(user);
-    })
-
-    command(client, 'test-job', async message => {
         console.log('Updating items...');
         const items = await firestore.collection('items').get();
 
@@ -96,20 +64,80 @@ client.on('ready', () => {
             const itemData = doc.data();
             const updatedItem = await crawler.parseItem(itemData.url);
             const oldPrice = itemData.price;
-            if (oldPrice === updatedItem.price){
+            if (oldPrice > updatedItem.price){
                 const prices = helpers.calcPercDiff(oldPrice, updatedItem.price);
                 // Update every subscribed user.
                 const users = await firestore.collection('items').doc(doc.id).collection('users').get();
                 users.forEach(async doc => {
-                    // console.log(doc.data());
                     const channel = client.users.cache.get(doc.data().discordID);
-                    embeds.sendBetterItemPriceEm(channel, itemData, prices);
+                    embeds.sendBetterItemPrice(channel, itemData, prices);
                 });
             }
-            
             await doc.ref.update(updatedItem);
         });
         console.log('Updated all successfully items!!');
+    });
+
+    command(client, 'tt', async message => {
+        // console.log('Updating items...');
+        // const items = await firestore.collection('items');
+        // const itemsData = await items.get();
+
+        // if (itemsData.empty)
+        //     return;
+
+        // const guild_id = config.mainServerID;
+        // const guild = client.guilds.cache.find(guild => guild.id === guild_id);
+        // let channel;
+        // if(guild.channels.cache.has(config.mainChannelID))
+        //     channel = guild.channels.cache.get(config.mainChannelID)
+
+        // itemsData.forEach(async doc => {
+        //     const itemData = doc.data();
+        //     const updatedItem = await crawler.parseItem(itemData.url);
+        //     const oldPrice = itemData.price;
+        //     if (oldPrice === updatedItem.price){
+        //         const prices = helpers.calcPercDiff(oldPrice, updatedItem.price);
+        //         embeds.sendBetterItemPrice(channel, itemData, prices);
+        //     }
+            
+        //     await doc.ref.update(updatedItem);
+        // });
+        // console.log('Updated all successfully items!!');
+    })
+
+    // THIS IS WORKING  
+    command(client, 'test-job', async message => {
+        // console.log('Updating items...');
+        // const items = await firestore.collection('items').get();
+
+        // if (items.empty)
+        //     return;
+
+        // const guild_id = config.testServerID;
+        // const guild = client.guilds.cache.find(guild => guild.id === guild_id);
+        // let channel;
+        // if(guild)
+        //     channel = getDefaultChannel(guild);
+
+        // items.forEach(async doc => {
+        //     const itemData = doc.data();
+        //     const updatedItem = await crawler.parseItem(itemData.url);
+        //     const oldPrice = itemData.price;
+        //     if (oldPrice === updatedItem.price){
+        //         const prices = helpers.calcPercDiff(oldPrice, updatedItem.price);
+        //         // Update every subscribed user.
+        //         const users = await firestore.collection('items').doc(doc.id).collection('users').get();
+        //         users.forEach(async doc => {
+        //             // console.log(doc.data());
+        //             const channel = client.users.cache.get(doc.data().discordID);
+        //             embeds.sendBetterItemPrice(channel, itemData, prices);
+        //         });
+        //     }
+            
+        //     await doc.ref.update(updatedItem);
+        // });
+        // console.log('Updated all successfully items!!');
     })
     
     command(client, 'track', async message => {
@@ -122,6 +150,10 @@ client.on('ready', () => {
             // CHECK ITEM
             // Scrape the item from online.
             const item = await crawler.parseItem(url, true);
+            if (item === false){
+                embeds.sendParseError(message);
+                return ;
+            }
             // Check if the item exists on the db.
 
             const itemAddedInfo = await itemController.tryAddingItem(item);
@@ -132,18 +164,18 @@ client.on('ready', () => {
             // Get user that send the cmd.
             const user = client.users.cache.get(message.author.id);
 
-            // Check if the item exists on the db.
+            // // Check if the item exists on the db.
             const userAdded = await itemController.tryAddingUser(user, itemAddedInfo.item.id);
             ////////////////////////////////////
 
             if (userAdded.isTracked === false || itemAddedInfo.isTracked === false){
-                embeds.sendAddedItemSucsEm(message);
+                embeds.sendAddedItemSucs(message);
             }else if (itemAddedInfo.isTracked && userAdded.isTracked){
-                embeds.sendItemExistAlreadyEm(message);
+                embeds.sendItemExistAlready(message);
                 return;
-            } else embeds.sendAddingItemErrorEm(message);
+            } else embeds.sendAddingItemError(message);
 
-        }else embeds.sendTrackCmdErrorEm(message);
+        }else embeds.sendTrackCmdError(message);
     });
 })
 

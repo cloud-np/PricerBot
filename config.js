@@ -14,7 +14,8 @@ const {
     BOT_TOKEN,
     PREFIX,
     MAIN_SERVER_ID,
-    TEST_SERVER_ID
+    TEST_SERVER_ID,
+    MAIN_CHANNEL_ID
 } = process.env;
 
 
@@ -31,6 +32,7 @@ module.exports = {
     },
     botToken: BOT_TOKEN,
     prefix: PREFIX,
+    mainChannelID: MAIN_CHANNEL_ID,
     mainServerID: MAIN_SERVER_ID,
     testServerID: TEST_SERVER_ID
 }

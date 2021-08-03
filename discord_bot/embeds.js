@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const config = require('../config');
 const { roundTo } = require('../helpers/calc');
 
-const sendAddingItemErrorEm = (message) => {
+const sendAddingItemError = (message) => {
     const em = new Discord.MessageEmbed()
         .setColor('#ed3434')
         .setAuthor('❌ Something went wrong!')
@@ -14,7 +14,7 @@ const sendAddingItemErrorEm = (message) => {
     message.channel.send(em);
 }
 
-const sendTrackCmdErrorEm = (message) => {
+const sendTrackCmdError = (message) => {
     const em = new Discord.MessageEmbed()
         .setColor('#ed3434')
         .setAuthor('❌ Wrong use of ' + config.prefix + 'track command!')
@@ -33,7 +33,7 @@ const sendTrackCmdErrorEm = (message) => {
     message.channel.send(em);
 }
 
-const sendHelpEm = (message) => {
+const sendHelp = (message) => {
     const em = new Discord.MessageEmbed()
         .setColor('#00d31c')
         .setAuthor('❔ Bot usage.')
@@ -45,7 +45,7 @@ const sendHelpEm = (message) => {
     message.channel.send(em);
 }
 
-const sendItemExistAlreadyEm = (message) => {
+const sendItemExistAlready = (message) => {
     const em = new Discord.MessageEmbed()
         .setColor('#00d31c')
         .setAuthor('✨ You already are tracking this item!')
@@ -57,7 +57,7 @@ const sendItemExistAlreadyEm = (message) => {
     message.channel.send(em);
 }
 
-const sendAddedItemSucsEm = (message) => {
+const sendAddedItemSucs = (message) => {
     const em = new Discord.MessageEmbed()
         .setColor('#00d31c')
         .setAuthor('👌 Item was added to your list!')
@@ -81,7 +81,19 @@ const test = (message) => {
     message.channel.send(em);
 }
 
-const sendBetterItemPriceEm = (channel, item, { newPrice, diffPerc, rawDiff }) => {
+const sendParseError = (channel) => {
+    // const partyblob = '<a:partyblob:866343043442671647>'
+    const em = new Discord.MessageEmbed()
+        .setColor('#ed3434')
+        .setAuthor('❌ The item you suggested doesn\' have enought ratings.')
+        .addFields(
+            { name: 'Not enough info', value: 'For now we can not parse items with not enough info.' }
+        )
+        .setTimestamp();
+    channel.send(em);
+}
+
+const sendBetterItemPrice = (channel, item, { newPrice, diffPerc, rawDiff }) => {
     // const partyblob = '<a:partyblob:866343043442671647>'
     const em = new Discord.MessageEmbed()
         .setColor('#2dfcf2')
@@ -99,11 +111,12 @@ const sendBetterItemPriceEm = (channel, item, { newPrice, diffPerc, rawDiff }) =
 }
 
 module.exports = {
-    sendTrackCmdErrorEm,
-    sendAddingItemErrorEm,
-    sendAddedItemSucsEm,
-    sendItemExistAlreadyEm,
-    sendBetterItemPriceEm,
-    sendHelpEm,
+    sendTrackCmdError,
+    sendAddingItemError,
+    sendAddedItemSucs,
+    sendItemExistAlready,
+    sendBetterItemPrice,
+    sendParseError,
+    sendHelp,
     test
 }

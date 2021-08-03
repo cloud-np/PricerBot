@@ -24,7 +24,9 @@ const tryAddingUser = async (user, itemID) => {
         if (foundUser) {
             return { user: foundUser, isTracked: true }
         } else {
-            const addedUser = await firestore.collection('items').doc(itemID).collection('users').add({
+            // You have to wait for the sub-collection to be created then you can add the subcribed user.
+            const userSubCol = await firestore.collection('items').doc(itemID).collection('users');
+            const addedUser = await userSubCol.add({
                 discordID: user.id,
                 discriminator: user.discriminator,
                 username: user.username
@@ -55,10 +57,11 @@ const doesItemExist = async (name) => {
     try {
         const itemsRef = await firestore.collection('items');
         const snapshot = await itemsRef.where('name', '==', name).get();
-        const foundItem = await snapshot.docs[0];
 
-        if (!foundItem.exists)
+        if (snapshot.empty)
             return false;
+
+        const foundItem = await snapshot.docs[0];
         return foundItem;
     } catch (error) {
         console.log(error);
