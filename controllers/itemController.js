@@ -46,7 +46,7 @@ const tryAddingItem = async (item) => {
             return { item: itemExistAlready, isTracked: true }
         } else {
             const addedItem = await firestore.collection('items').add(item);
-            return { item: addedItem.id, isTracked: false }
+            return { item: addedItem, isTracked: false }
         }
     } catch (error) {
         return false;
