@@ -81,8 +81,21 @@ const test = (message) => {
     message.channel.send(em);
 }
 
+const sendShowTrackedItems = (message, subItems) => {
+    const fields = subItems.map(item => {
+       return { name: item.data().name, value: `Last lowest price **${item.data().price}**`}
+    });
+    const em = new Discord.MessageEmbed()
+        .setColor('#00ffe1')
+        .setAuthor('🎯 Your tracked Items.')
+        .addFields(
+            // { name: '', value: 'For now we can not parse items with not enough info.' }
+            fields
+        )
+        .setTimestamp();
+    message.channel.send(em);
+}
 const sendParseError = (channel) => {
-    // const partyblob = '<a:partyblob:866343043442671647>'
     const em = new Discord.MessageEmbed()
         .setColor('#ed3434')
         .setAuthor('❌ The item you suggested doesn\' have enought ratings.')
@@ -117,6 +130,7 @@ module.exports = {
     sendItemExistAlready,
     sendBetterItemPrice,
     sendParseError,
+    sendShowTrackedItems,
     sendHelp,
     test
 }

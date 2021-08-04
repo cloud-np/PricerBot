@@ -43,8 +43,9 @@ client.on('ready', () => {
         embeds.sendHelp(message);
     });
 
-    command(client, 'show-tracked', message => {
-
+    command(client, 'show-tracked', async message => {
+        const subItems = await itemController.getUserSubItems(message.author.id);
+        embeds.sendShowTrackedItems(message, subItems);
     });
 
     const job = schedule.scheduleJob('0 0 * * *', async function(){
@@ -139,7 +140,7 @@ client.on('ready', () => {
         // });
         // console.log('Updated all successfully items!!');
     })
-    
+
     command(client, 'track', async message => {
         // Remove spaces and keep the message from the user.
         const url = message.content.split(' ').join('').split(config.prefix + 'track')[1];
@@ -155,7 +156,6 @@ client.on('ready', () => {
                 return ;
             }
             // Check if the item exists on the db.
-
             const itemAddedInfo = await itemController.tryAddingItem(item);
             ////////////////////////////////////
 
@@ -172,7 +172,7 @@ client.on('ready', () => {
                 embeds.sendAddedItemSucs(message);
             }else if (itemAddedInfo.isTracked && userAdded.isTracked){
                 embeds.sendItemExistAlready(message);
-                return;
+                return ;
             } else embeds.sendAddingItemError(message);
 
         }else embeds.sendTrackCmdError(message);

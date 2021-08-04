@@ -17,6 +17,22 @@ const doesUserExist = async (discordID, itemID) => {
     }
 }
 
+const getUserSubItems = async (discordID) => {
+    try {
+        const items = await getAllItems();
+        // let subItems = [];
+        const subItems = items.docs.map(async item => {
+            const foundUser = await doesUserExist(discordID, item.id);
+            if (foundUser !== false)
+                return item;
+        });
+        return Promise.all(subItems);
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
 const tryAddingUser = async (user, itemID) => {
     try {
         const foundUser = await doesUserExist(user.id, itemID);
@@ -55,7 +71,7 @@ const tryAddingItem = async (item) => {
 
 const doesItemExist = async (name) => {
     try {
-        const itemsRef = await firestore.collection('items');
+        const itemsRef = firestore.collection('items');
         const snapshot = await itemsRef.where('name', '==', name).get();
 
         if (snapshot.empty)
@@ -71,9 +87,9 @@ const doesItemExist = async (name) => {
 
 const getAllItems = async () => {
     try {
-        const items = await firestore.collection('items');
-        const data = await items.get();
-        return data;
+        const itemsRef = firestore.collection('items');
+        const items = await itemsRef.get();
+        return items;
     } catch (error) {
         console.log(error);
         return false;
@@ -95,6 +111,7 @@ module.exports = {
     doesItemExist,
     getAllItems,
     // getItem,
+    getUserSubItems,
     tryAddingUser,
     doesUserExist,
     // updateItem,
